@@ -34,7 +34,7 @@ public class User {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "connections",
             joinColumns = @JoinColumn(name = "user_id"),
