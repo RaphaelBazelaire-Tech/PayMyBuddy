@@ -1,4 +1,4 @@
-package com.paymybuddy.model;
+package com.paymybuddy.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,11 +43,11 @@ public class User {
     private Set<User> connections = new HashSet<>();
 
     @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
-    private List<Transaction> sentTransactions;
+    private List<TransactionEntity> sentTransactions;
 
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
-    private List<Transaction> receivedTransactions;
+    private List<TransactionEntity> receivedTransactions;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<BankAccount> bankAccounts;
+    private List<BankAccountEntity> bankAccounts;
 }
