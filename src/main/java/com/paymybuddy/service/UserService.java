@@ -1,34 +1,46 @@
 package com.paymybuddy.service;
 
 import com.paymybuddy.controller.dto.RegisterDTO;
-import com.paymybuddy.model.BankAccount;
-import com.paymybuddy.model.User;
+import com.paymybuddy.mapper.BankAccountMapper;
+import com.paymybuddy.mapper.UserMapper;
+import com.paymybuddy.model.BankAccountModel;
+import com.paymybuddy.model.UserModel;
+import com.paymybuddy.repository.entity.BankAccountEntity;
+import com.paymybuddy.repository.entity.UserEntity;
 import com.paymybuddy.repository.BankAccountRepository;
 import com.paymybuddy.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final BankAccountRepository bankAccountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final BankAccountMapper bankAccountMapper;
 
     @Transactional(readOnly = true)
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
+    public UserModel findByEmail(String email) {
+        UserEntity userEntity = findEntityByEmail(email);
+        return userMapper.toModel(userEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BankAccountModel> getBankAccounts(String email) {
+        UserEntity userEntity = findEntityByEmail(email);
+        return bankAccountRepository.findByUser(userEntity).stream()
+                .map(bankAccountMapper::toModel)
+                .collect(Collectors.toList());
     }
 
     public void register(RegisterDTO dto) {
@@ -40,7 +52,7 @@ public class UserService {
             throw new RuntimeException("Les mots de passe ne correspondent pas.");
         }
 
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -54,8 +66,8 @@ public class UserService {
             throw new RuntimeException("Vous ne pouvez pas vous ajouter vous-même.");
         }
 
-        User currentUser = findByEmail(userEmail);
-        User friendUser = userRepository.findByEmail(friendEmail)
+        UserEntity currentUser = findEntityByEmail(userEmail);
+        UserEntity friendUser = userRepository.findByEmail(friendEmail)
                 .orElseThrow(() -> new RuntimeException("Aucun utilisateur trouvé avec l'email : " + friendEmail));
 
         boolean alreadyAdded = currentUser.getConnections().stream()
@@ -70,7 +82,7 @@ public class UserService {
     }
 
     public void removeConnection(String userEmail, int friendId) {
-        User currentUser = findByEmail(userEmail);
+        UserEntity currentUser = findEntityByEmail(userEmail);
         currentUser.getConnections().removeIf(connection -> connection.getId().equals(friendId));
         userRepository.save(currentUser);
     }
@@ -80,7 +92,7 @@ public class UserService {
             throw new RuntimeException("Le montant du dépôt doit être positif.");
         }
 
-        User user = findByEmail(userEmail);
+        UserEntity user = findEntityByEmail(userEmail);
         user.setBalance(user.getBalance().add(amount));
         userRepository.save(user);
     }
@@ -89,9 +101,9 @@ public class UserService {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Le montant du virement doit être positif.");
         }
-        User user = findByEmail(email);
+        UserEntity user = findEntityByEmail(email);
 
-        BankAccount bankAccount = bankAccountRepository.findById(bankAccountId)
+        BankAccountEntity bankAccount = bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() -> new RuntimeException("Compte bancaire introuvable."));
 
         if (!bankAccount.getUser().getId().equals(user.getId())) {
@@ -106,8 +118,8 @@ public class UserService {
     }
 
     public void addBankAccount(String email, String iban, String bic, String bankName) {
-        User user = findByEmail(email);
-        BankAccount bankAccount = new BankAccount();
+        UserEntity user = findEntityByEmail(email);
+        BankAccountEntity bankAccount = new BankAccountEntity();
         bankAccount.setUser(user);
         bankAccount.setIban(iban.toUpperCase().replaceAll("\\s+", ""));
         bankAccount.setBic(bic.toUpperCase());
@@ -116,8 +128,8 @@ public class UserService {
     }
 
     public void deleteBankAccount(String email, Integer bankAccountId) {
-        User user = findByEmail(email);
-        BankAccount bankAccount = bankAccountRepository.findById(bankAccountId)
+        UserEntity user = findEntityByEmail(email);
+        BankAccountEntity bankAccount = bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() -> new RuntimeException("Compte bancaire introuvable."));
 
         if (!bankAccount.getUser().getId().equals(user.getId())) {
@@ -127,15 +139,15 @@ public class UserService {
     }
 
     public void updateUsername(String email, String newUsername) {
-        User user = findByEmail(email);
+        UserEntity user = findEntityByEmail(email);
         user.setUsername(newUsername);
         userRepository.save(user);
     }
 
     public void updatePassword(String email, String currentPassword, String newPassword, String confirmPassword) {
-        User user = findByEmail(email);
+        UserEntity user = findEntityByEmail(email);
 
-        if (!passwordEncoder.matches(newPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new RuntimeException("Les mots de passe ne correspondent pas.");
         }
 
@@ -144,5 +156,10 @@ public class UserService {
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    UserEntity findEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
     }
 }

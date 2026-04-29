@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    private Set<User> connections = new HashSet<>();
+    private Set<UserEntity> connections = new HashSet<>();
 
     @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
     private List<TransactionEntity> sentTransactions;

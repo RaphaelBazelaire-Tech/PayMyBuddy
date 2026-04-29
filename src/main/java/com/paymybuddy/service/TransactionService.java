@@ -1,10 +1,12 @@
 package com.paymybuddy.service;
 
-import com.paymybuddy.model.Transaction;
-import com.paymybuddy.model.User;
+import com.paymybuddy.mapper.TransactionMapper;
+import com.paymybuddy.model.TransactionModel;
+import com.paymybuddy.repository.entity.TransactionEntity;
+import com.paymybuddy.repository.entity.UserEntity;
 import com.paymybuddy.repository.TransactionRepository;
 import com.paymybuddy.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,25 +14,25 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TransactionService {
 
     private static final BigDecimal FEE_RATE = new BigDecimal("0.005");
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final TransactionMapper transactionMapper;
 
-    @Autowired
-    private UserRepository userRepository;
+    public TransactionModel transfer(String senderEmail, Integer receiverId, BigDecimal amount, String description) {
 
-    public Transaction transfer(String senderEmail, Integer receiverId, BigDecimal amount, String description) {
-
-        User sender = userRepository.findByEmail(senderEmail)
+        UserEntity sender = userRepository.findByEmail(senderEmail)
                 .orElseThrow(() -> new RuntimeException("L'expéditeur est introuvable."));
 
-        User receiver = userRepository.findById(receiverId)
+        UserEntity receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new RuntimeException("Le destinataire est introuvable."));
 
         boolean isConnection = sender.getConnections().stream()
@@ -53,19 +55,28 @@ public class TransactionService {
         userRepository.save(sender);
         userRepository.save(receiver);
 
-        Transaction transaction = new Transaction();
+        TransactionEntity transaction = new TransactionEntity();
         transaction.setSender(sender);
         transaction.setReceiver(receiver);
         transaction.setAmount(amount);
         transaction.setFee(fee);
         transaction.setDescription(description);
         transaction.setDateTransaction(LocalDateTime.now());
+        TransactionEntity saved = transactionRepository.save(transaction);
 
-        return transactionRepository.save(transaction);
+        return transactionMapper.toModel(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<Transaction> getTransactionsBySender(User sender) {
-        return transactionRepository.findBySenderOrderByDateTransactionDesc(sender);
+    public List<TransactionModel> getTransactionsBySender(String senderEmail) {
+
+        UserEntity sender = userRepository.findByEmail(senderEmail)
+                .orElseThrow(() -> new RuntimeException("Expéditeur introuvable."));
+
+        return transactionRepository
+                .findBySenderOrderByDateTransactionDesc(sender)
+                .stream()
+                .map(transactionMapper::toModel)
+                .collect(Collectors.toList());
     }
 }

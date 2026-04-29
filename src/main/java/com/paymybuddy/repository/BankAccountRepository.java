@@ -1,14 +1,14 @@
 package com.paymybuddy.repository;
 
-import com.paymybuddy.model.BankAccount;
-import com.paymybuddy.model.User;
+import com.paymybuddy.repository.entity.BankAccountEntity;
+import com.paymybuddy.repository.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount,Integer> {
+public interface BankAccountRepository extends JpaRepository<BankAccountEntity, Integer> {
 
-    List<BankAccount> findByUser(User user);
+    List<BankAccountEntity> findByUser(UserEntity user);
 }
