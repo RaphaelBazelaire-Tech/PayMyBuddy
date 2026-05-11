@@ -13,10 +13,8 @@
 <div class="auth-page">
   <main id="main-content" class="auth-card" aria-labelledby="login-heading">
 
-    <!-- Logo -->
     <div class="auth-logo-btn" role="img" aria-label="Pay My Buddy">Pay My Buddy</div>
 
-    <!-- Alertes -->
     <div th:if="${errorMsg}"  class="alert alert-danger"  role="alert" aria-live="assertive" style="width:100%;margin-bottom:1rem;">
       <span th:text="${errorMsg}"></span>
     </div>
@@ -29,7 +27,6 @@
 
     <h1 id="login-heading" class="sr-only">Connexion à Pay My Buddy</h1>
 
-    <!-- Formulaire -->
     <form th:action="@{/login}" method="post" novalidate style="width:100%;">
 
       <div class="auth-fields">

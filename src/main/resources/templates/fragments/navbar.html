@@ -2,11 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!--
-  Fragment navbar réutilisé dans toutes les pages authentifiées.
-  Utilisation : th:replace="~{fragments/navbar :: navbar(activePage='home')}"
-  activePage : 'home' | 'profile' | 'add-connection'
--->
 <nav th:fragment="navbar(activePage)" class="navbar" aria-label="Navigation principale">
 
   <a href="/home" class="navbar-brand">Pay My Buddy</a>

@@ -16,7 +16,6 @@
 
 <main id="main-content" class="page-wrapper">
 
-  <!-- Alertes flash -->
   <div th:if="${successMsg}" class="alert alert-success" role="status" aria-live="polite">
     <span th:text="${successMsg}"></span>
   </div>
@@ -26,10 +25,8 @@
 
   <h1 class="sr-only">Mon profil</h1>
 
-  <!-- ── Lignes du profil ──────────────────────────────────── -->
   <div class="profile-rows" style="max-width: 620px;">
 
-    <!-- USERNAME -->
     <div class="profile-row">
       <span class="profile-label">Username</span>
       <span class="profile-value" id="val-username"
@@ -41,7 +38,6 @@
               onclick="toggleEdit('edit-username', this)">›</button>
     </div>
 
-    <!-- Formulaire inline : modifier username -->
     <div id="edit-username" class="profile-edit-form" role="region" aria-label="Modifier le pseudo">
       <form th:action="@{/profile/update-username}" method="post">
         <label class="sr-only" for="new-username">Nouveau pseudo</label>
@@ -63,14 +59,12 @@
       </form>
     </div>
 
-    <!-- MAIL (lecture seule) -->
     <div class="profile-row">
       <span class="profile-label">Mail</span>
       <span class="profile-value" th:text="${user.email}">nom@domain.com</span>
       <span class="profile-chevron" aria-hidden="true" style="cursor:default; opacity:.4;">›</span>
     </div>
 
-    <!-- MOT DE PASSE -->
     <div class="profile-row">
       <span class="profile-label">Mot de passe</span>
       <span class="profile-value">••••••••</span>
@@ -81,7 +75,6 @@
               onclick="toggleEdit('edit-password', this)">›</button>
     </div>
 
-    <!-- Formulaire inline : modifier mot de passe -->
     <div id="edit-password" class="profile-edit-form" role="region" aria-label="Modifier le mot de passe">
       <form th:action="@{/profile/update-password}" method="post">
 
@@ -129,12 +122,6 @@
 
   </div>
 
-  <!-- ── Bouton Modifier ──────────────────────────────────── -->
-  <!--
-    Dans la maquette, le bouton "Modifier" est positionné en face de la ligne
-    Mot de passe. Il sert de raccourci pour ouvrir directement le formulaire
-    de modification du mot de passe.
-  -->
   <div class="profile-actions">
     <button type="button"
             class="btn btn-orange"
@@ -145,13 +132,11 @@
 
 </main>
 
-<!-- Minimal JS : toggle formulaires inline -->
 <script>
   function toggleEdit(formId, chevron) {
     const form = document.getElementById(formId);
     const isOpen = form.classList.contains('open');
 
-    // Ferme tous les formulaires ouverts
     document.querySelectorAll('.profile-edit-form.open').forEach(f => {
       f.classList.remove('open');
     });
@@ -160,20 +145,18 @@
       btn.style.color = '';
     });
 
-    // Ouvre/ferme le formulaire ciblé
     if (!isOpen) {
       form.classList.add('open');
       if (chevron && chevron.setAttribute) {
         chevron.setAttribute('aria-expanded', 'true');
         chevron.style.color = '#2B7CE9';
       }
-      // Focus sur le premier champ
+
       const first = form.querySelector('input');
       if (first) first.focus();
     }
   }
 
-  // Si une alerte est présente suite à une soumission, ouvrir le bon formulaire
   (function() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('edit') === 'password') {

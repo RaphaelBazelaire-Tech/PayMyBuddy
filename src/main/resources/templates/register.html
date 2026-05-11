@@ -13,17 +13,14 @@
 <div class="auth-page">
   <main id="main-content" class="auth-card" aria-labelledby="register-heading">
 
-    <!-- Logo -->
     <div class="auth-logo-btn" role="img" aria-label="Pay My Buddy">Pay My Buddy</div>
 
     <h1 id="register-heading" class="sr-only">Inscription à Pay My Buddy</h1>
 
-    <!-- Alertes -->
     <div th:if="${errorMsg}" class="alert alert-danger" role="alert" aria-live="assertive" style="width:100%;margin-bottom:1rem;">
       <span th:text="${errorMsg}"></span>
     </div>
 
-    <!-- Formulaire -->
     <form th:action="@{/register}" method="post" th:object="${registerDTO}" novalidate style="width:100%;">
 
       <div class="auth-fields">
@@ -73,8 +70,6 @@
                th:errors="*{password}"></div>
         </div>
 
-        <!-- Confirmation — champ fonctionnel, visuellement absent du Figma,
-             conservé pour la validation backend -->
         <div>
           <label class="sr-only" for="confirmPassword">Confirmer le mot de passe</label>
           <input id="confirmPassword"
