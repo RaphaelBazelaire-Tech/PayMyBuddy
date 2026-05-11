@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connexion — Pay My Buddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu</a>
+
+<div class="auth-page">
+  <main id="main-content" class="auth-card" aria-labelledby="login-heading">
+
+    <!-- Logo -->
+    <div class="auth-logo-btn" role="img" aria-label="Pay My Buddy">Pay My Buddy</div>
+
+    <!-- Alertes -->
+    <div th:if="${errorMsg}"  class="alert alert-danger"  role="alert" aria-live="assertive" style="width:100%;margin-bottom:1rem;">
+      <span th:text="${errorMsg}"></span>
+    </div>
+    <div th:if="${logoutMsg}" class="alert alert-success" role="status" aria-live="polite" style="width:100%;margin-bottom:1rem;">
+      <span th:text="${logoutMsg}"></span>
+    </div>
+    <div th:if="${successMsg}" class="alert alert-success" role="status" aria-live="polite" style="width:100%;margin-bottom:1rem;">
+      <span th:text="${successMsg}"></span>
+    </div>
+
+    <h1 id="login-heading" class="sr-only">Connexion à Pay My Buddy</h1>
+
+    <!-- Formulaire -->
+    <form th:action="@{/login}" method="post" novalidate style="width:100%;">
+
+      <div class="auth-fields">
+        <div>
+          <label class="sr-only" for="email">Adresse mail</label>
+          <input id="email"
+                 name="email"
+                 type="email"
+                 class="form-input"
+                 placeholder="Mail"
+                 autocomplete="email"
+                 required
+                 aria-required="true"
+                 autofocus/>
+        </div>
+        <div>
+          <label class="sr-only" for="password">Mot de passe</label>
+          <input id="password"
+                 name="password"
+                 type="password"
+                 class="form-input"
+                 placeholder="Mot de passe"
+                 autocomplete="current-password"
+                 required
+                 aria-required="true"/>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:center;">
+        <button type="submit" class="btn btn-blue auth-submit">Se connecter</button>
+      </div>
+
+    </form>
+
+    <p style="margin-top:1.5rem; font-size:.85rem; color:#6B7280; text-align:center;">
+      Pas encore de compte ?
+      <a th:href="@{/register}" style="color:#2B7CE9; font-weight:500;">S'inscrire</a>
+    </p>
+
+  </main>
+</div>
+
+</body>
+</html>

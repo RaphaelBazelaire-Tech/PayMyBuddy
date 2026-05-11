@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ajouter une relation — Pay My Buddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu</a>
+
+<div th:replace="~{fragments/navbar :: navbar(activePage='add-connection')}"></div>
+
+<main id="main-content" class="add-relation-wrapper">
+
+  <h1 class="sr-only">Ajouter une relation</h1>
+
+  <!-- Alertes flash -->
+  <div th:if="${successMsg}" class="alert alert-success" role="status" aria-live="polite"
+       style="max-width:700px; margin-bottom:1.5rem;">
+    <span th:text="${successMsg}"></span>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger" role="alert" aria-live="assertive"
+       style="max-width:700px; margin-bottom:1.5rem;">
+    <span th:text="${errorMsg}"></span>
+  </div>
+
+  <!-- Formulaire -->
+  <form th:action="@{/add-connection}" method="post" novalidate>
+
+    <p class="add-relation-label">Chercher une relation</p>
+
+    <div class="add-relation-row">
+      <label class="sr-only" for="friendEmail">Adresse mail de votre relation</label>
+      <input id="friendEmail"
+             name="friendEmail"
+             type="email"
+             class="form-input"
+             placeholder="Saisir une adresse mail"
+             autocomplete="email"
+             required
+             aria-required="true"
+             autofocus/>
+      <button type="submit" class="btn btn-orange">Ajouter</button>
+    </div>
+
+  </form>
+
+</main>
+
+</body>
+</html>

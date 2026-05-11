@@ -1,8 +1,10 @@
 package com.paymybuddy.controller;
 
 import com.paymybuddy.controller.dto.TransferDTO;
-import com.paymybuddy.repository.model.Transaction;
-import com.paymybuddy.repository.model.User;
+import com.paymybuddy.model.TransactionModel;
+import com.paymybuddy.model.UserModel;
+import com.paymybuddy.repository.entity.TransactionEntity;
+import com.paymybuddy.repository.entity.UserEntity;
 import com.paymybuddy.service.TransactionService;
 import com.paymybuddy.service.UserService;
 import jakarta.validation.Valid;
@@ -30,8 +32,8 @@ public class HomeController {
     @GetMapping
     public String homePage(Authentication authentication, Model model) {
 
-        User currentUser = userService.findByEmail(authentication.getName());
-        List<Transaction> transactions = transactionService.getTransactionsBySender(currentUser);
+        UserModel currentUser = userService.findByEmail(authentication.getName());
+        List<TransactionModel> transactions = transactionService.getTransactionsBySender(authentication.getName());
 
         model.addAttribute("user", currentUser);
         model.addAttribute("connections", currentUser.getConnections());
@@ -48,13 +50,12 @@ public class HomeController {
                            RedirectAttributes redirectAttributes,
                            Model model) {
 
-        User currentUser = userService.findByEmail(authentication.getName());
-
         if (result.hasErrors()) {
+            UserModel currentUser = userService.findByEmail(authentication.getName());
 
             model.addAttribute("user", currentUser);
             model.addAttribute("connections", currentUser.getConnections());
-            model.addAttribute("transactions", transactionService.getTransactionsBySender(currentUser));
+            model.addAttribute("transactions", transactionService.getTransactionsBySender(authentication.getName()));
 
             return "home";
         }

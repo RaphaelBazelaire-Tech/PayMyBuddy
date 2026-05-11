@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transférer — Pay My Buddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu</a>
+
+<!-- Navbar partagée, lien actif = "home" -->
+<div th:replace="~{fragments/navbar :: navbar(activePage='home')}"></div>
+
+<main id="main-content" class="page-wrapper">
+
+  <!-- Alertes flash -->
+  <div th:if="${successMsg}" class="alert alert-success" role="status" aria-live="polite">
+    <span th:text="${successMsg}"></span>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger" role="alert" aria-live="assertive">
+    <span th:text="${errorMsg}"></span>
+  </div>
+
+  <!-- ── Barre de virement ─────────────────────────────────── -->
+  <section aria-labelledby="transfer-heading">
+    <h1 id="transfer-heading" class="sr-only">Effectuer un transfert</h1>
+
+    <!-- Pas de contacts -->
+    <div th:if="${#sets.isEmpty(connections)}" class="alert alert-info" role="status">
+      Ajoutez d'abord une relation depuis
+      <a th:href="@{/add-connection}" style="color:#1E40AF;font-weight:500;">Ajouter relation</a>
+      pour pouvoir effectuer un virement.
+    </div>
+
+    <!-- Formulaire horizontal -->
+    <form th:if="${!#sets.isEmpty(connections)}"
+          th:action="@{/home/transfer}"
+          method="post"
+          th:object="${transferDTO}"
+          novalidate>
+
+      <div class="transfer-bar">
+
+        <!-- Sélectionner une relation -->
+        <div class="select-wrap">
+          <label class="sr-only" for="receiverId">Sélectionner une relation</label>
+          <select id="receiverId"
+                  name="receiverId"
+                  th:field="*{receiverId}"
+                  class="form-input form-select"
+                  required
+                  aria-required="true">
+            <option value="">Sélectionner une relation</option>
+            <option th:each="c : ${connections}"
+                    th:value="${c.id}"
+                    th:text="${c.username}">
+            </option>
+          </select>
+          <div th:if="${#fields.hasErrors('receiverId')}" class="field-error" role="alert"
+               th:errors="*{receiverId}"></div>
+        </div>
+
+        <!-- Description -->
+        <div class="desc-wrap">
+          <label class="sr-only" for="description">Description</label>
+          <input id="description"
+                 th:field="*{description}"
+                 type="text"
+                 class="form-input"
+                 placeholder="Description"
+                 autocomplete="off"/>
+        </div>
+
+        <!-- Montant -->
+        <div class="amount-wrap">
+          <label class="sr-only" for="amount">Montant en euros</label>
+          <input id="amount"
+                 th:field="*{amount}"
+                 type="number"
+                 step="0.01"
+                 min="0.01"
+                 class="form-input form-number"
+                 placeholder="0€"
+                 required
+                 aria-required="true"
+                 aria-describedby="fee-hint"/>
+          <div th:if="${#fields.hasErrors('amount')}" class="field-error" role="alert"
+               th:errors="*{amount}"></div>
+        </div>
+
+        <!-- Bouton -->
+        <div class="btn-wrap">
+          <button type="submit" class="btn btn-blue" id="fee-hint"
+                  title="0,5 % de frais appliqués">
+            Payer
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </section>
+
+  <!-- ── Tableau des transactions ──────────────────────────── -->
+  <section aria-labelledby="tx-heading">
+
+    <div class="transactions-box">
+      <div class="transactions-box-title" id="tx-heading">Mes Transactions</div>
+
+      <!-- Vide -->
+      <div th:if="${#lists.isEmpty(transactions)}" class="tx-empty" role="status">
+        Aucune transaction pour l'instant.
+      </div>
+
+      <!-- Tableau -->
+      <table th:if="${!#lists.isEmpty(transactions)}"
+             class="tx-table"
+             aria-label="Historique de vos transactions">
+        <caption class="sr-only">Liste de vos transactions : relation, description et montant</caption>
+        <thead>
+          <tr>
+            <th scope="col">Relations</th>
+            <th scope="col">Description</th>
+            <th scope="col">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="tx : ${transactions}">
+            <td th:text="${tx.receiver.username}">—</td>
+            <td th:text="${tx.description != null and !tx.description.isEmpty() ? tx.description : '—'}">—</td>
+            <td th:text="${#numbers.formatDecimal(tx.amount, 1, 0) + '€'}">0€</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>

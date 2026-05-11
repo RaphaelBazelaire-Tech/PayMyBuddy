@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscription — Pay My Buddy</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu</a>
+
+<div class="auth-page">
+  <main id="main-content" class="auth-card" aria-labelledby="register-heading">
+
+    <!-- Logo -->
+    <div class="auth-logo-btn" role="img" aria-label="Pay My Buddy">Pay My Buddy</div>
+
+    <h1 id="register-heading" class="sr-only">Inscription à Pay My Buddy</h1>
+
+    <!-- Alertes -->
+    <div th:if="${errorMsg}" class="alert alert-danger" role="alert" aria-live="assertive" style="width:100%;margin-bottom:1rem;">
+      <span th:text="${errorMsg}"></span>
+    </div>
+
+    <!-- Formulaire -->
+    <form th:action="@{/register}" method="post" th:object="${registerDTO}" novalidate style="width:100%;">
+
+      <div class="auth-fields">
+
+        <div>
+          <label class="sr-only" for="username">Nom d'utilisateur</label>
+          <input id="username"
+                 th:field="*{username}"
+                 type="text"
+                 class="form-input"
+                 placeholder="Username"
+                 autocomplete="username"
+                 required
+                 aria-required="true"
+                 autofocus/>
+          <div th:if="${#fields.hasErrors('username')}" class="field-error" role="alert"
+               th:errors="*{username}"></div>
+        </div>
+
+        <div>
+          <label class="sr-only" for="email">Adresse mail</label>
+          <input id="email"
+                 th:field="*{email}"
+                 type="email"
+                 class="form-input"
+                 placeholder="Mail"
+                 autocomplete="email"
+                 required
+                 aria-required="true"/>
+          <div th:if="${#fields.hasErrors('email')}" class="field-error" role="alert"
+               th:errors="*{email}"></div>
+        </div>
+
+        <div>
+          <label class="sr-only" for="password">Mot de passe</label>
+          <input id="password"
+                 th:field="*{password}"
+                 type="password"
+                 class="form-input"
+                 placeholder="Mot de passe"
+                 autocomplete="new-password"
+                 required
+                 aria-required="true"
+                 aria-describedby="password-hint"/>
+          <div id="password-hint" class="sr-only">6 caractères minimum</div>
+          <div th:if="${#fields.hasErrors('password')}" class="field-error" role="alert"
+               th:errors="*{password}"></div>
+        </div>
+
+        <!-- Confirmation — champ fonctionnel, visuellement absent du Figma,
+             conservé pour la validation backend -->
+        <div>
+          <label class="sr-only" for="confirmPassword">Confirmer le mot de passe</label>
+          <input id="confirmPassword"
+                 th:field="*{confirmPassword}"
+                 type="password"
+                 class="form-input"
+                 placeholder="Confirmer le mot de passe"
+                 autocomplete="new-password"
+                 required
+                 aria-required="true"/>
+        </div>
+
+      </div>
+
+      <div style="display:flex; justify-content:center;">
+        <button type="submit" class="btn btn-blue auth-submit">S'inscrire</button>
+      </div>
+
+    </form>
+
+    <p style="margin-top:1.5rem; font-size:.85rem; color:#6B7280; text-align:center;">
+      Déjà un compte ?
+      <a th:href="@{/login}" style="color:#2B7CE9; font-weight:500;">Se connecter</a>
+    </p>
+
+  </main>
+</div>
+
+</body>
+</html>

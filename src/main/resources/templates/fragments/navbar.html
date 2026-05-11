@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Fragment navbar réutilisé dans toutes les pages authentifiées.
+  Utilisation : th:replace="~{fragments/navbar :: navbar(activePage='home')}"
+  activePage : 'home' | 'profile' | 'add-connection'
+-->
+<nav th:fragment="navbar(activePage)" class="navbar" aria-label="Navigation principale">
+
+  <a href="/home" class="navbar-brand">Pay My Buddy</a>
+
+  <ul class="navbar-nav" role="list">
+    <li>
+      <a th:href="@{/home}"
+         class="nav-link"
+         th:classappend="${activePage == 'home'} ? ' active'"
+         th:attr="aria-current=${activePage == 'home'} ? 'page' : null">
+        Transférer
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/profile}"
+         class="nav-link"
+         th:classappend="${activePage == 'profile'} ? ' active'"
+         th:attr="aria-current=${activePage == 'profile'} ? 'page' : null">
+        Profil
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/add-connection}"
+         class="nav-link"
+         th:classappend="${activePage == 'add-connection'} ? ' active'"
+         th:attr="aria-current=${activePage == 'add-connection'} ? 'page' : null">
+        Ajouter relation
+      </a>
+    </li>
+    <li>
+      <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="nav-link logout">Se déconnecter</button>
+      </form>
+    </li>
+  </ul>
+
+</nav>
+
+</body>
+</html>
